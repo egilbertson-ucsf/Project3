@@ -315,18 +315,18 @@ def main():
         layers=[
             (4, None),
             (3, Sigmoid),
-            (3, Sigmoid),
-            (2, Sigmoid)
+            # (3, Sigmoid),
+            (1, Sigmoid)
         ],
-        learning_rate=0.1
+        learning_rate=0.05
     )
 
 
-    # loss = MSE()
+    loss_fn = MSE()
     # nn.forward(x)
     # nn.backward(x, loss)
     # nn.fit(x, y, loss, n_epochs=100)
-    loss_fn = BCE()
+    # loss_fn = BCE()
 
     for epoch in np.arange(1000):
         losses = []
@@ -340,6 +340,7 @@ def main():
             losses.append(loss)
 
         nn.step()
+        nn.clear()
 
         if epoch % 10 == 0:
             print("Mean Loss at epoch {} : {:.6f}".format(epoch, np.mean(losses)))
@@ -349,6 +350,11 @@ def main():
         #     print(Y.ravel())
         #     break
 
+    predictions = nn.forward(X)
+    truth = Y.ravel()
+
+    print(predictions)
+    print(truth)
 
 if __name__ == '__main__':
     main()
