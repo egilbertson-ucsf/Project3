@@ -6,25 +6,25 @@ import sys
 
 class Loss:
 
-    def __loss__(self, *args, **kwargs):
-        pass
+    def loss(self, *args, **kwargs):
+        return self.__loss__(*args, **kwargs)
 
-    def __derivative(self, *args, **kwargs):
-        pass
+    def derivative(self, *args, **kwargs):
+        return self.__derivative__(*args, **kwargs)
 
 
 class MSE(Loss):
 
-    def loss(self, x, y):
+    def __loss__(self, x, y):
         return np.mean((x - y)**2)
 
-    def derivative(self, x, y):
+    def __derivative__(self, x, y):
         return np.mean(x - y)
 
 
 class BCE(Loss):
 
-    def loss(self, x, y, eps=1e-12):
+    def __loss__(self, x, y, eps=1e-12):
         x = np.clip(x, eps, 1-eps)
         y = np.clip(y, eps, 1-eps)
         loss = -np.mean(
@@ -33,7 +33,7 @@ class BCE(Loss):
 
         return loss
 
-    def derivative(self, x, y, eps=1e-12):
+    def __derivative__(self, x, y, eps=1e-12):
         x = np.clip(x, eps, 1-eps)
         y = np.clip(y, eps, 1-eps)
         loss = np.mean(
@@ -99,11 +99,11 @@ class NeuralNetwork:
         sig = self.sigmoid(x)
         return sig - (1 - sig)
 
-    def cost(self, x, y):
-        return np.mean((x - y) ** 2)
-
-    def dCost(self, x, y):
-        return np.mean(x - y)
+    # def cost(self, x, y):
+    #     return np.mean((x - y) ** 2)
+    #
+    # def dCost(self, x, y):
+    #     return np.mean(x - y)
 
     def forward(self, x):
         """
@@ -181,7 +181,6 @@ class NeuralNetwork:
             cache_dC_dA_dZ.append(dC_dA_dZ)
             d_weights[idx - 1] = dC_dW.copy()
             d_bias[idx - 1] = dC_dB.copy()
-
 
         self.d_weights.append(d_weights)
         self.d_bias.append(d_bias)
@@ -262,6 +261,7 @@ def main():
         for x, y in zip(X, Y):
             pred = nn.forward(x)
             loss = loss_fn.loss(pred, y)
+
             nn.backward(y, loss_fn)
 
             predictions.append(pred)
@@ -274,6 +274,7 @@ def main():
             print(np.array(predictions).ravel())
             print(Y.ravel())
             break
+
 
 if __name__ == '__main__':
     main()
