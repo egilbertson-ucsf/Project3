@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import numpy as np
 from sklearn.datasets import make_blobs
-import sys
 
 
 class Loss:
@@ -17,6 +16,9 @@ class Loss:
 
 
 class MSE(Loss):
+    """
+    Mean Squared Error Loss Function
+    """
 
     def __loss__(self, x, y):
         """
@@ -30,7 +32,7 @@ class MSE(Loss):
         Calculates Derivative of Mean Squared Error w.r.t to X
         """
 
-        return np.mean(x - y)
+        return 2*np.mean(x - y)
 
 
 class CE(Loss):
@@ -80,8 +82,6 @@ class Activation:
 class Sigmoid(Activation):
     """
     Sigmoidal Activation function
-
-    AKA the zero to one squishification.
     """
 
     def __positive__(self, x):
@@ -121,8 +121,33 @@ class Sigmoid(Activation):
         implemented derivative of sigmoid function
         """
 
-        sig = self.activation(x)
-        return sig - (1 - sig)
+        sig = self.__activation__(x)
+        return sig * (1 - sig)
+
+
+class TanH(Activation):
+    """
+    Tanh Activation Function
+    """
+
+    def __activation__(self, x):
+        """
+        calculates activation
+        """
+
+        ez = np.exp(x)
+        enz = np.exp(-x)
+
+        return (ez - enz) / (ez + enz)
+
+    def __derivative__(self, x):
+        """
+        calculates derivative
+        """
+
+        tanh = self.__activation__(x)
+
+        return 1 - (tanh**2)
 
 
 class Free(Activation):
@@ -319,7 +344,7 @@ class NeuralNetwork:
         self.d_weights = []
         self.d_bias = []
 
-    def fit(self, X, Y, Loss, n_epochs=100):
+    def fit(self, X, Y, Loss, n_epochs=100, status_updates=10):
         """
         trains model given X:observations and Y:labels
         """
@@ -336,7 +361,7 @@ class NeuralNetwork:
             self.step()
             self.clear()
 
-            if epoch % 10 == 0:
+            if (epoch % status_updates == 0) | (epoch == n_epochs-1):
                 print(
                     "Mean Loss at epoch {} : {:.6f}".format(
                         epoch, np.mean(losses)
@@ -380,6 +405,7 @@ def main():
 
     nn.fit(X, Y, Loss, n_epochs=300)
     nn.predict(X)
+
 
 if __name__ == '__main__':
     main()
