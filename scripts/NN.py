@@ -4,7 +4,7 @@ import numpy as np
 
 class NeuralNetwork:
 
-    def __init__(self, layers = [3, 2, 3], learning_rate=0.1):
+    def __init__(self, layers=[3, 2, 3], learning_rate=0.1):
 
         self.layers = np.array(layers)
         self.learning_rate = np.array(learning_rate).reshape(1, 1)
@@ -41,16 +41,12 @@ class NeuralNetwork:
                     np.random.random(self.layers[i])
                 )
 
-
-
             self.params['zs'].append(
-                np.zeros(self.layers[i]).\
-                    reshape(self.layers[i], 1)
+                np.zeros(self.layers[i]).reshape(self.layers[i], 1)
             )
 
             self.params['as'].append(
-                np.zeros(self.layers[i]).\
-                    reshape(self.layers[i], 1)
+                np.zeros(self.layers[i]).reshape(self.layers[i], 1)
             )
 
     def sigmoid(self, x):
@@ -123,12 +119,10 @@ class NeuralNetwork:
                 # calculates current activation derivative using cached layers
                 dC_dA = cache_dC_dA_dZ[-1] @ self.params['weights'][idx]
 
-
             # derivative of activation wrt z-layer
             dA_dZ = self.dSigmoid(
                 self.params['as'][idx]
             )
-
 
             # derivative of z-layer wrt to weights
             dZ_dW = self.params['as'][idx-1]
@@ -142,12 +136,10 @@ class NeuralNetwork:
             # derivative of cost wrt to bias
             dC_dB = (self.learning_rate * dC_dA_dZ).reshape(-1)
 
-
             # cache calculated derivatives
             cache_dC_dA_dZ.append(dC_dA_dZ)
             d_weights[idx - 1] = dC_dW.copy()
             d_bias[idx - 1] = dC_dB.copy()
-
 
         self.d_weights.append(d_weights)
         self.d_bias.append(d_bias)
@@ -170,14 +162,13 @@ class NeuralNetwork:
                 d_weight_tensor.append(dw)
                 d_bias_tensor.append(db)
 
-
             # consolidate arrays into multidimensional tensor
             d_weight_tensor = np.array(d_weight_tensor)
             d_bias_tensor = np.array(d_bias_tensor)
 
             # take mean across the zero axis
-            mean_d_weight_tensor = d_weight_tensor.mean(axis = 0)
-            mean_d_bias_tensor = d_bias_tensor.mean(axis = 0)
+            mean_d_weight_tensor = d_weight_tensor.mean(axis=0)
+            mean_d_bias_tensor = d_bias_tensor.mean(axis=0)
 
             # update weights and biases
             self.params['weights'][i] -= mean_d_weight_tensor
@@ -187,7 +178,7 @@ class NeuralNetwork:
         self.d_weights = []
         self.d_bias = []
 
-    def fit(self, x, y, n_epochs = 100, n_iter=50):
+    def fit(self, x, y, n_epochs=100, n_iter=50):
 
         for e in np.arange(n_epochs):
 
@@ -210,9 +201,10 @@ def main():
     x = np.random.random((1, n))
 
     nn = NeuralNetwork(
-        layers = [n, 5, 5, 5, n]
+        layers=[n, 5, 5, 5, n]
     )
     nn.fit(x, x)
+
 
 if __name__ == '__main__':
     main()
