@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 import numpy as np
 from sklearn.datasets import make_blobs
-import sys
 
 
 class Loss:
+    """
+    Parent Class for Loss Functions
+    """
 
     def loss(self, *args, **kwargs):
         return self.__loss__(*args, **kwargs)
@@ -16,33 +18,56 @@ class Loss:
 class MSE(Loss):
 
     def __loss__(self, x, y):
+        """
+        Calculates Mean Squared Error Loss Function
+        """
+
         return np.mean((x - y)**2)
 
     def __derivative__(self, x, y):
+        """
+        Calculates Derivative of Mean Squared Error w.r.t to X
+        """
+
         return np.mean(x - y)
 
 
-class BCE(Loss):
+class CE(Loss):
+    """
+    Cross Entropy Loss with SoftMax included
+    """
 
-    def __loss__(self, x, y, eps=1e-12):
-        x = np.clip(x, eps, 1-eps)
-        y = np.clip(y, eps, 1-eps)
-        loss = -np.mean(
-            (y * np.log(x)) + ((1-y) * np.log(1-x))
-        )
+    def softmax(self, x):
+        """
+        calculates softmax of a given array
+        """
 
+        exps = np.exp(x - np.max(x))
+        return exps / np.sum(exps)
+
+    def __loss__(self, x, y):
+        """
+        Applies softmax to an array then calculates loss
+        """
+
+        p = self.softmax(x)
+        loss = np.sum(-y * np.log(p))
         return loss
 
-    def __derivative__(self, x, y, eps=1e-12):
-        x = np.clip(x, eps, 1-eps)
-        y = np.clip(y, eps, 1-eps)
-        loss = np.mean(
-            (x - y) / ((1-x) * x)
-        )
-        return loss
+    def __derivative__(self, x, y):
+        """
+        Calculates derivative of Cross Entropy w.r.t X
+        (SoftMax gradient included)
+        """
+
+        grad = self.softmax(x) - y
+        return grad
 
 
 class Activation:
+    """
+    Parent class for Activation Functions
+    """
 
     def activation(self, *args, **kwargs):
         return self.__activation__(*args, **kwargs)
@@ -52,17 +77,24 @@ class Activation:
 
 
 class Sigmoid(Activation):
+    """
+    Sigmoidal Activation function
+
+    AKA the zero to one squishification.
+    """
 
     def __positive__(self, x):
         """
         calculates positive terms
         """
+
         return 1 / (1 + np.exp(-x))
 
     def __negative__(self, x):
         """
         calculates negative terms
         """
+
         exps = np.exp(x)
         return exps / (1 + exps)
 
@@ -70,6 +102,7 @@ class Sigmoid(Activation):
         """
         calculates sigmoid function in a numerically stable way
         """
+
         mask_p = x >= 0
         mask_n = ~mask_p
 
@@ -91,27 +124,28 @@ class Sigmoid(Activation):
         return sig - (1 - sig)
 
 
-class SoftMax(Activation):
+class Free(Activation):
+    """
+    Empty Activation Layer
+    """
 
     def __activation__(self, x):
         """
-        calculates softmax function in a numerically stable way
+        pass current input forward without modification
         """
-        shiftx = x - np.max(x)
-        exps = np.exp(shiftx)
-        return exps / np.sum(exps)
+        return x
 
     def __derivative__(self, x):
         """
-        calculates derivative of softmax function
+        pass constant derivative backwards
         """
-        sz = self.activation(x)
-        return sz * (1 - sz)
+
+        return 1
 
 
 class NeuralNetwork:
 
-    def __init__(self, layers=[3, 2, 3], learning_rate=0.1):
+    def __init__(self, layers, learning_rate=0.1):
 
         self.layers = np.array(layers)
         self.learning_rate = np.array(learning_rate).reshape(1, 1)
@@ -217,6 +251,7 @@ class NeuralNetwork:
                     self.layers[idx][0],
                     loss.derivative(self.params['as'][idx], y)
                 )
+                dC_dA = dC_dA.reshape(1, dC_dA.size)
 
             else:
 
@@ -303,8 +338,13 @@ def main():
 
     np.random.seed(42)
 
-    X, Y = make_blobs(n_samples=100, n_features=4, centers=2)
-    Y = Y.reshape(Y.size, 1)
+    X, labels = make_blobs(n_samples=300, n_features=4, centers=4)
+    # Y = Y.reshape(Y.size, 1)
+    Y = np.zeros((labels.size, 4))
+    Y[np.flatnonzero(labels == 0), 0] = 1
+    Y[np.flatnonzero(labels == 1), 1] = 1
+    Y[np.flatnonzero(labels == 2), 2] = 1
+    Y[np.flatnonzero(labels == 3), 3] = 1
     # print(Y)
 
     # n = 4
@@ -315,18 +355,16 @@ def main():
         layers=[
             (4, None),
             (3, Sigmoid),
-            # (3, Sigmoid),
-            (1, Sigmoid)
+            (4, Free)
         ],
-        learning_rate=0.05
+        learning_rate=0.1
     )
 
-
-    loss_fn = MSE()
+    # loss_fn = MSE()
     # nn.forward(x)
     # nn.backward(x, loss)
     # nn.fit(x, y, loss, n_epochs=100)
-    # loss_fn = BCE()
+    loss_fn = CE()
 
     for epoch in np.arange(1000):
         losses = []
@@ -345,16 +383,11 @@ def main():
         if epoch % 10 == 0:
             print("Mean Loss at epoch {} : {:.6f}".format(epoch, np.mean(losses)))
 
-        # if epoch == 5:
-        #     print(np.array(predictions).ravel())
-        #     print(Y.ravel())
-        #     break
+    predictions = np.argmax(nn.forward(X), axis=1)
+    truth = np.argmax(Y, axis=1)
 
-    predictions = nn.forward(X)
-    truth = Y.ravel()
 
-    print(predictions)
-    print(truth)
+
 
 if __name__ == '__main__':
     main()
