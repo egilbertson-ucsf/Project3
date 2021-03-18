@@ -53,12 +53,34 @@ class Activation:
 
 class Sigmoid(Activation):
 
+    def __positive__(self, x):
+        """
+        calculates positive terms
+        """
+        return 1 / (1 + np.exp(-x))
+
+    def __negative__(self, x):
+        """
+        calculates negative terms
+        """
+        exps = np.exp(x)
+        return exps / (1 + exps)
+
     def __activation__(self, x):
         """
-        calculates sigmoid function
+        calculates sigmoid function in a numerically stable way
         """
+        mask_p = x >= 0
+        mask_n = ~mask_p
 
-        return 1 / (1 + np.exp(-x))
+        sig = np.zeros_like(x)
+        if np.any(mask_p):
+            sig[mask_p] = self.__positive__(x[mask_p])
+
+        if np.any(mask_n):
+            sig[mask_n] = self.__negative__(x[mask_n])
+
+        return sig
 
     def __derivative__(self, x):
         """
@@ -67,6 +89,24 @@ class Sigmoid(Activation):
 
         sig = self.activation(x)
         return sig - (1 - sig)
+
+
+class SoftMax(Activation):
+
+    def __activation__(self, x):
+        """
+        calculates softmax function in a numerically stable way
+        """
+        shiftx = x - np.max(x)
+        exps = np.exp(shiftx)
+        return exps / np.sum(exps)
+
+    def __derivative__(self, x):
+        """
+        calculates derivative of softmax function
+        """
+        sz = self.activation(x)
+        return sz * (1 - sz)
 
 
 class NeuralNetwork:
@@ -181,7 +221,7 @@ class NeuralNetwork:
             else:
 
                 # calculates current activation derivative using cached layers
-                dC_dA = cache_dC_dA_dZ[-1] @ self.params['weights'][idx]
+                dC_dA = cache_dC_dA_dZ[-1].T @ self.params['weights'][idx]
 
             # derivative of activation wrt z-layer
             dA_dZ = self.params['f'][idx].derivative(
@@ -189,13 +229,14 @@ class NeuralNetwork:
             )
 
             # derivative of z-layer wrt to weights
-            dZ_dW = self.params['as'][idx-1]
+            dZ_dW = self.params['as'][idx-1].\
+                reshape(1, self.params['as'][idx-1].size)
 
             # perform shared multiplicative term
-            dC_dA_dZ = (dC_dA * dA_dZ)
+            dC_dA_dZ = (dC_dA * dA_dZ).reshape(self.layers[idx][0], 1)
 
             # derivative of cost wrt to weights
-            dC_dW = self.learning_rate * (dC_dA_dZ.T @ dZ_dW)
+            dC_dW = self.learning_rate * (dC_dA_dZ @ dZ_dW)
 
             # derivative of cost wrt to bias
             dC_dB = (self.learning_rate * dC_dA_dZ).reshape(-1)
@@ -262,49 +303,51 @@ def main():
 
     np.random.seed(42)
 
-    # X, Y = make_blobs(n_samples=100, n_features=4, centers=2)
-    # Y = Y.reshape(Y.size, 1)
+    X, Y = make_blobs(n_samples=100, n_features=4, centers=2)
+    Y = Y.reshape(Y.size, 1)
     # print(Y)
 
-    n = 4
-    x = np.random.random((1, n))
-    y = x.copy()
-
+    # n = 4
+    # x = np.random.random((1, n))
+    # y = x.copy()
+    #
     nn = NeuralNetwork(
         layers=[
             (4, None),
             (3, Sigmoid),
-            (4, Sigmoid)
+            (3, Sigmoid),
+            (2, Sigmoid)
         ],
-        learning_rate=0.01
+        learning_rate=0.1
     )
 
 
-    loss = MSE()
+    # loss = MSE()
     # nn.forward(x)
     # nn.backward(x, loss)
-    nn.fit(x, y, loss, n_epochs=100)
-    # loss_fn = BCE()
+    # nn.fit(x, y, loss, n_epochs=100)
+    loss_fn = BCE()
 
-    # for epoch in np.arange(1000):
-    #     losses = []
-    #     predictions = []
-    #     for x, y in zip(X, Y):
-    #         pred = nn.forward(x)
-    #         loss = loss_fn.loss(pred, y)
-    #
-    #         nn.backward(y, loss_fn)
-    #
-    #         predictions.append(pred)
-    #         losses.append(loss)
-    #
-    #     nn.step()
-    #     print("Mean Loss at epoch {} : {:.6f}".format(epoch, np.mean(losses)))
-    #
-    #     if epoch == 5:
-    #         print(np.array(predictions).ravel())
-    #         print(Y.ravel())
-    #         break
+    for epoch in np.arange(1000):
+        losses = []
+        predictions = []
+        for x, y in zip(X, Y):
+            pred = nn.forward(x)
+            loss = loss_fn.loss(pred, y)
+            nn.backward(y, loss_fn)
+
+            predictions.append(pred)
+            losses.append(loss)
+
+        nn.step()
+
+        if epoch % 10 == 0:
+            print("Mean Loss at epoch {} : {:.6f}".format(epoch, np.mean(losses)))
+
+        # if epoch == 5:
+        #     print(np.array(predictions).ravel())
+        #     print(Y.ravel())
+        #     break
 
 
 if __name__ == '__main__':
