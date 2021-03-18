@@ -1,5 +1,45 @@
 #!/usr/bin/env python3
 import numpy as np
+from sklearn.datasets import make_blobs
+import sys
+
+
+class Loss:
+
+    def __loss__(self, *args, **kwargs):
+        pass
+
+    def __derivative(self, *args, **kwargs):
+        pass
+
+
+class MSE(Loss):
+
+    def loss(self, x, y):
+        return np.mean((x - y)**2)
+
+    def derivative(self, x, y):
+        return np.mean(x - y)
+
+
+class BCE(Loss):
+
+    def loss(self, x, y, eps=1e-12):
+        x = np.clip(x, eps, 1-eps)
+        y = np.clip(y, eps, 1-eps)
+        loss = -np.mean(
+            (y * np.log(x)) + ((1-y) * np.log(1-x))
+        )
+
+        return loss
+
+    def derivative(self, x, y, eps=1e-12):
+        x = np.clip(x, eps, 1-eps)
+        y = np.clip(y, eps, 1-eps)
+        loss = np.mean(
+            (x - y) / ((1-x) * x)
+        )
+        return loss
 
 
 class NeuralNetwork:
@@ -95,14 +135,13 @@ class NeuralNetwork:
 
         return self.params['as'][-1]
 
-    def backward(self, y):
+    def backward(self, y, loss):
 
         cache_dC_dA_dZ = []
         d_weights = self.params['weights'].copy()
         d_bias = self.params['bias'].copy()
 
         for idx in np.arange(self.layers.size)[::-1]:
-
             if idx == 0:
                 break
 
@@ -110,9 +149,11 @@ class NeuralNetwork:
 
                 # derivative of cost wrt final activation
                 dC_dA = np.full(
-                    self.params['as'][idx].size,
-                    self.dCost(self.params['as'][idx], y)
+                    self.layers[idx],
+                    loss.derivative(self.params['as'][idx], y)
                 )
+
+                break
 
             else:
 
@@ -140,6 +181,7 @@ class NeuralNetwork:
             cache_dC_dA_dZ.append(dC_dA_dZ)
             d_weights[idx - 1] = dC_dW.copy()
             d_bias[idx - 1] = dC_dB.copy()
+
 
         self.d_weights.append(d_weights)
         self.d_bias.append(d_bias)
@@ -193,18 +235,45 @@ class NeuralNetwork:
             if e % 10 == 0:
                 print("loss @ epoch {}: {:.4f}".format(e, loss))
 
+            # break
+
 
 def main():
+
     np.random.seed(42)
 
-    n = 100
-    x = np.random.random((1, n))
+    X, Y = make_blobs(n_samples=100, n_features=4, centers=2)
+    Y = Y.reshape(Y.size, 1)
+    print(Y)
+
+    # n = 4
+    # x = np.random.random((1, n))
+    # y = x.copy()
 
     nn = NeuralNetwork(
-        layers=[n, 5, 5, 5, n]
+        layers=[4, 2, 1], learning_rate=0.01
     )
-    nn.fit(x, x)
+    # loss = MSE()
+    loss_fn = BCE()
 
+    for epoch in np.arange(1000):
+        losses = []
+        predictions = []
+        for x, y in zip(X, Y):
+            pred = nn.forward(x)
+            loss = loss_fn.loss(pred, y)
+            nn.backward(y, loss_fn)
+
+            predictions.append(pred)
+            losses.append(loss)
+
+        nn.step()
+        print("Mean Loss at epoch {} : {:.6f}".format(epoch, np.mean(losses)))
+
+        if epoch == 5:
+            print(np.array(predictions).ravel())
+            print(Y.ravel())
+            break
 
 if __name__ == '__main__':
     main()
