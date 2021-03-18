@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 
+
 class NeuralNetwork:
 
     def __init__(self, layers = [3, 2, 3], learning_rate=0.1):
@@ -189,7 +190,6 @@ class NeuralNetwork:
     def fit(self, x, y, n_epochs = 100, n_iter=50):
 
         for e in np.arange(n_epochs):
-
 
             pred = self.forward(x)
             loss = self.cost(pred, y)
