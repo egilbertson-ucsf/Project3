@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 from sklearn.datasets import make_blobs
+import sys
 
 
 class Loss:
@@ -318,76 +319,67 @@ class NeuralNetwork:
         self.d_weights = []
         self.d_bias = []
 
-    def fit(self, x, y, Loss, n_epochs=100, n_iter=50):
+    def fit(self, X, Y, Loss, n_epochs=100):
+        """
+        trains model given X:observations and Y:labels
+        """
 
-        for e in np.arange(n_epochs):
+        for epoch in np.arange(n_epochs):
+            losses = []
+            for x, y in zip(X, Y):
+                pred = self.forward(x)
+                loss = Loss.loss(pred, y)
+                self.backward(y, Loss)
 
-            pred = self.forward(x)
-            loss = Loss.loss(pred, y)
-
-            self.backward(y, Loss)
+                losses.append(loss)
 
             self.step()
             self.clear()
 
-            if e % 10 == 0:
-                print("loss @ epoch {}: {:.4f}".format(e, loss))
+            if epoch % 10 == 0:
+                print(
+                    "Mean Loss at epoch {} : {:.6f}".format(
+                        epoch, np.mean(losses)
+                        )
+                )
+
+    def predict(self, X):
+        """
+        feeds forward all observations in X and returns predictions
+        """
+
+        predictions = []
+        for x in X:
+            pred = self.forward(x)
+            predictions.append(pred)
+
+        return np.array(predictions)
 
 
 def main():
 
     np.random.seed(42)
 
-    X, labels = make_blobs(n_samples=300, n_features=4, centers=4)
-    # Y = Y.reshape(Y.size, 1)
+    X, labels = make_blobs(n_samples=100, n_features=8, centers=3)
     Y = np.zeros((labels.size, 4))
     Y[np.flatnonzero(labels == 0), 0] = 1
     Y[np.flatnonzero(labels == 1), 1] = 1
     Y[np.flatnonzero(labels == 2), 2] = 1
     Y[np.flatnonzero(labels == 3), 3] = 1
-    # print(Y)
 
-    # n = 4
-    # x = np.random.random((1, n))
-    # y = x.copy()
-    #
     nn = NeuralNetwork(
         layers=[
-            (4, None),
-            (3, Sigmoid),
+            (8, None),
+            (4, Sigmoid),
             (4, Free)
         ],
-        learning_rate=0.1
+        learning_rate=0.05
     )
+    # Loss = MSE()
+    Loss = CE()
 
-    # loss_fn = MSE()
-    # nn.forward(x)
-    # nn.backward(x, loss)
-    # nn.fit(x, y, loss, n_epochs=100)
-    loss_fn = CE()
-
-    for epoch in np.arange(1000):
-        losses = []
-        predictions = []
-        for x, y in zip(X, Y):
-            pred = nn.forward(x)
-            loss = loss_fn.loss(pred, y)
-            nn.backward(y, loss_fn)
-
-            predictions.append(pred)
-            losses.append(loss)
-
-        nn.step()
-        nn.clear()
-
-        if epoch % 10 == 0:
-            print("Mean Loss at epoch {} : {:.6f}".format(epoch, np.mean(losses)))
-
-    predictions = np.argmax(nn.forward(X), axis=1)
-    truth = np.argmax(Y, axis=1)
-
-
-
+    nn.fit(X, Y, Loss, n_epochs=300)
+    nn.predict(X)
 
 if __name__ == '__main__':
     main()
