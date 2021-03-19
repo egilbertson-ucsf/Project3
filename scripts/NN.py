@@ -12,6 +12,11 @@ class Loss:
     def loss(self, *args, **kwargs):
         """
         return child class loss function
+
+        :param x: array-like
+        :param y: array-like
+
+        :returns: array-like
         """
 
         return self.__loss__(*args, **kwargs)
@@ -19,6 +24,11 @@ class Loss:
     def derivative(self, *args, **kwargs):
         """
         return derivative of child class loss function
+
+        :param x: array-like
+        :param y: array-like
+
+        :returns: array-like
         """
 
         return self.__derivative__(*args, **kwargs)
@@ -84,6 +94,10 @@ class Activation:
     def activation(self, *args, **kwargs):
         """
         Return activation function from child class
+
+        :params x: a 1D array to apply function to
+
+        :returns x: a 1D array after function application
         """
 
         return self.__activation__(*args, **kwargs)
@@ -91,6 +105,10 @@ class Activation:
     def derivative(self, *args, **kwargs):
         """
         Return derivative of activation function from child class
+
+        :params x: a 1D array to calculate derivative of
+
+        :returns x: a 1D array of derivatives
         """
 
         return self.__derivative__(*args, **kwargs)
@@ -189,6 +207,9 @@ class Free(Activation):
 class NeuralNetwork:
     """
     Implementation of a feed forward neural network with backpropagation
+
+    :param layers: a list of (int, NN.Activation) tuples to specify layers
+    :param learning_rate: the learning rate to train model with
     """
 
     def __init__(self, layers, learning_rate=0.1):
@@ -207,9 +228,9 @@ class NeuralNetwork:
         self.d_weights = []
         self.d_bias = []
 
-        self.initialize_params()
+        self._initialize_params()
 
-    def initialize_params(self):
+    def _initialize_params(self):
         """
         randomly initializes weights and biases
 
@@ -251,6 +272,10 @@ class NeuralNetwork:
     def forward(self, x):
         """
         forward propagation through network
+
+        :params x: input layer to pass forward
+
+        :returns y: final activation layer
         """
 
         self.params['as'][0] = x
@@ -278,9 +303,12 @@ class NeuralNetwork:
 
         return self.params['as'][-1]
 
-    def backward(self, y, loss):
+    def backward(self, y, Loss):
         """
         calculates gradients via backpropagation
+
+        :param y: true values to calculate loss
+        :param Loss: NN.Loss object to calculate derivative with
         """
 
         # cache previous layers derivatives
@@ -303,7 +331,7 @@ class NeuralNetwork:
                 # derivative of cost wrt final activation
                 dC_dA = np.full(
                     self.layers[idx][0],
-                    loss.derivative(self.params['as'][idx], y)
+                    Loss.derivative(self.params['as'][idx], y)
                 )
                 dC_dA = dC_dA.reshape(1, dC_dA.size)
 
@@ -341,7 +369,7 @@ class NeuralNetwork:
 
     def step(self):
         """
-        steps through weights and biases and applies derivatives
+        Steps through weights and biases and applies derivatives
         """
 
         # iterate through layers
@@ -374,7 +402,7 @@ class NeuralNetwork:
 
     def clear(self):
         """
-        empty the current derivatives and biases
+        Empty the current derivatives and biases
         """
 
         self.d_weights = []
@@ -382,7 +410,14 @@ class NeuralNetwork:
 
     def fit(self, X, Y, Loss, n_epochs=100, status_updates=10, verbose=False):
         """
-        trains model given X:observations and Y:labels
+        Trains model given X:observations and Y:labels
+
+        :param X: observations to pass through network
+        :param Y: labels to use in backpropagation
+        :param Loss: NN.Loss object as Cost function
+        :param n_epochs: Number of epochs to train model
+        :param status_updates: Number of epochs to report mean loss
+        :param verbose: Boolean of verbosity
         """
 
         # iterate through dataset
@@ -424,7 +459,10 @@ class NeuralNetwork:
 
     def minibatch_reader(self, *args, batch_size=10):
         """
-        shuffles indices and yields batches of indices
+        Shuffles indices and yields batches of indices
+
+        :params args: any number of datasets to create batched indices for
+        :returns g: a generator of indices used to subset datasets
         """
 
         num_obs = np.unique([a.shape[0] for a in args])
@@ -453,7 +491,15 @@ class NeuralNetwork:
                       verbose=False
                       ):
         """
-        trains a model with minibatch regularization
+        Trains a model with minibatch regularization
+
+        :param X: observations to pass through network
+        :param Y: labels to use in backpropagation
+        :param Loss: NN.Loss object as Cost function
+        :param n_epochs: Number of epochs to train model
+        :param batch_size: Number of observations in each batch
+        :param status_updates: Number of epochs to report mean loss
+        :param verbose: Boolean of verbosity
         """
 
         # iterate through dataset
@@ -495,7 +541,10 @@ class NeuralNetwork:
 
     def predict(self, X):
         """
-        feeds forward all observations in X and returns predictions
+        Feeds forward all observations in X and returns predictions
+
+        :param X: Observations to predict values for
+        :returns Y: Predicted labels of X
         """
 
         # stores predictions

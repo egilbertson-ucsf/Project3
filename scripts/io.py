@@ -6,6 +6,10 @@ import numpy as np
 class FastaReader:
     """
     Implementation of a Fasta Reader
+
+    Can be treated as an iterable
+
+    :params [path]: Filename of a fasta formatted txt file
     """
 
     def __init__(self, path):
@@ -43,6 +47,8 @@ class Kmerize:
     """
     Implementation of class to generate kmers from sequences.
     Can interact with any iterable.
+
+    :params [k]: an integer representing the size of kmers
     """
 
     def __init__(self, k=17):
@@ -57,6 +63,10 @@ class Kmerize:
     def get_kmers(self, s):
         """
         calculates kmers as slices of sequences
+
+        :params [s]: a string to create kmers from
+
+        :returns [g]: returns a generator of kmers
         """
 
         for i in range(len(s) - self.k + 1):
@@ -67,6 +77,10 @@ class Kmerize:
         iterates through sequences and returns kmers
 
         Optionally can return One Hot Encoded Kmers
+
+        :params [iterable]: any iterable of sequences to convert to kmers
+
+        :returns [g]: returns a generator of kmers
         """
         for header, seq in iterable:
             for kmers in self.get_kmers(seq):
@@ -82,8 +96,12 @@ def norm(X):
     """
     Applies a normalization transformation to a given dataset
 
-    1) Shifts all values to positive range (+abs(min))
+    1) Shifts all values to positive range ( +abs(min) )
     2) Scale values to 1/max in column
+
+    :params [X]: a 2D array to normalize
+
+    :returns [N]: a 2D array that is shifted and normalized
     """
 
     norm = X.copy()
@@ -96,7 +114,13 @@ def norm(X):
 
 def OneHotEncoding(labels, lookup=None, flatten=False):
     """
-    transforms a given vector of labels into a one hot encoded matrix
+    Transforms a given vector of labels into a one hot encoded matrix
+
+    :param [labels]: an array-like of labels
+    :param [lookup]: a dictionary mapping labels to integers (optional)
+    :param [flatten]: boolean of whether to return a flattened matrix
+
+    :returns [ohe]: a 1/2D array of One Hot Encoded labels
     """
     if not lookup:
 
@@ -121,7 +145,12 @@ def OneHotEncoding(labels, lookup=None, flatten=False):
 
 def InverseOneHotEncoding(ohe, alphabet):
     """
-    convert flattened one hot encoding back into original alphabet
+    Converts a flattened one hot encoding back into original alphabet
+
+    :param [ohe]: a 1D one hot encoded array to de-embed back to labels
+    :param [alphabet]: a 1D array of labels where indices reflect ohe encoding
+
+    :returns [seq]: a string reflecting de-encoded labels
     """
 
     alphabet = np.array(alphabet)
@@ -135,7 +164,12 @@ def InverseOneHotEncoding(ohe, alphabet):
 
 def TrainTestSplit(*args, train_size=0.8):
     """
-    shuffles and splits a given set of data evenly
+    Shuffles and splits a given set of data evenly
+
+    :param [args] : any number of datasets to apply same split to
+    :param [train_size]: the fraction of observations to use in training split
+
+    :returns [_tr, _te]: generator of splits with (train, test) ordering
     """
 
     # confirm all datasets share the same size
@@ -166,8 +200,14 @@ def TrainTestSplit(*args, train_size=0.8):
 
 def SubsetData(data, n=200):
     """
-    randomly samples <n> observations from a given set of data w/o replacement
+    Randomly samples <n> observations from a given set of data w/o replacement
+
+    :param [d]: a dataset to subsample
+    :param [n]: a number of observations to sample without replacement
+
+    :returns [N]: <n> observations sampled from data without replacement
     """
+
     n = int(n)
     ind = np.arange(data.shape[0])
     np.random.shuffle(ind)
