@@ -1,0 +1,593 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Welcome to my Neural Net Implementation! &mdash; Project 3 March 19 2021 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> Project 3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Welcome to my Neural Net Implementation!</a></li>
+<li><a class="reference internal" href="#neural-network">Neural Network</a></li>
+<li><a class="reference internal" href="#loss-functions">Loss Functions</a></li>
+<li><a class="reference internal" href="#activation-functions">Activation Functions</a></li>
+<li><a class="reference internal" href="#file-io">File IO</a></li>
+<li><a class="reference internal" href="#data-transformations-and-utilities">Data Transformations and Utilities</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Project 3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Welcome to my Neural Net Implementation!</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-my-neural-net-implementation">
+<h1>Welcome to my Neural Net Implementation!<a class="headerlink" href="#welcome-to-my-neural-net-implementation" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="neural-network">
+<h1>Neural Network<a class="headerlink" href="#neural-network" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="scripts.NN.NeuralNetwork">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.NN.</code><code class="sig-name descname">NeuralNetwork</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">layers</span></em>, <em class="sig-param"><span class="n">learning_rate</span><span class="o">=</span><span class="default_value">0.1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.NeuralNetwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of a feed forward neural network with backpropagation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layers</strong> – a list of (int, NN.Activation) tuples to specify layers</p></li>
+<li><p><strong>learning_rate</strong> – the learning rate to train model with</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="scripts.NN.NeuralNetwork.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">Loss</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.NeuralNetwork.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates gradients via backpropagation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> – true values to calculate loss</p></li>
+<li><p><strong>Loss</strong> – NN.Loss object to calculate derivative with</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scripts.NN.NeuralNetwork.clear">
+<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.NeuralNetwork.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Empty the current derivatives and biases</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scripts.NN.NeuralNetwork.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">Y</span></em>, <em class="sig-param"><span class="n">Loss</span></em>, <em class="sig-param"><span class="n">n_epochs</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">status_updates</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.NeuralNetwork.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains model given X:observations and Y:labels</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – observations to pass through network</p></li>
+<li><p><strong>Y</strong> – labels to use in backpropagation</p></li>
+<li><p><strong>Loss</strong> – NN.Loss object as Cost function</p></li>
+<li><p><strong>n_epochs</strong> – Number of epochs to train model</p></li>
+<li><p><strong>status_updates</strong> – Number of epochs to report mean loss</p></li>
+<li><p><strong>verbose</strong> – Boolean of verbosity</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scripts.NN.NeuralNetwork.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.NeuralNetwork.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>forward propagation through network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Params x</dt>
+<dd class="field-odd"><p>input layer to pass forward</p>
+</dd>
+<dt class="field-even">Returns y</dt>
+<dd class="field-even"><p>final activation layer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scripts.NN.NeuralNetwork.minibatch_fit">
+<code class="sig-name descname">minibatch_fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">Y</span></em>, <em class="sig-param"><span class="n">Loss</span></em>, <em class="sig-param"><span class="n">n_epochs</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">status_updates</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.NeuralNetwork.minibatch_fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains a model with minibatch regularization</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – observations to pass through network</p></li>
+<li><p><strong>Y</strong> – labels to use in backpropagation</p></li>
+<li><p><strong>Loss</strong> – NN.Loss object as Cost function</p></li>
+<li><p><strong>n_epochs</strong> – Number of epochs to train model</p></li>
+<li><p><strong>batch_size</strong> – Number of observations in each batch</p></li>
+<li><p><strong>status_updates</strong> – Number of epochs to report mean loss</p></li>
+<li><p><strong>verbose</strong> – Boolean of verbosity</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scripts.NN.NeuralNetwork.minibatch_reader">
+<code class="sig-name descname">minibatch_reader</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.NeuralNetwork.minibatch_reader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shuffles indices and yields batches of indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Params args</dt>
+<dd class="field-odd"><p>any number of datasets to create batched indices for</p>
+</dd>
+<dt class="field-even">Returns g</dt>
+<dd class="field-even"><p>a generator of indices used to subset datasets</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scripts.NN.NeuralNetwork.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.NeuralNetwork.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Feeds forward all observations in X and returns predictions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> – Observations to predict values for</p>
+</dd>
+<dt class="field-even">Returns Y</dt>
+<dd class="field-even"><p>Predicted labels of X</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scripts.NN.NeuralNetwork.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.NeuralNetwork.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Steps through weights and biases and applies derivatives</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="loss-functions">
+<h1>Loss Functions<a class="headerlink" href="#loss-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="scripts.NN.Loss">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.NN.</code><code class="sig-name descname">Loss</code><a class="headerlink" href="#scripts.NN.Loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parent Class for Loss Functions</p>
+<dl class="py method">
+<dt id="scripts.NN.Loss.derivative">
+<code class="sig-name descname">derivative</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.Loss.derivative" title="Permalink to this definition">¶</a></dt>
+<dd><p>return derivative of child class loss function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – array-like</p></li>
+<li><p><strong>y</strong> – array-like</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scripts.NN.Loss.loss">
+<code class="sig-name descname">loss</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.Loss.loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>return child class loss function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – array-like</p></li>
+<li><p><strong>y</strong> – array-like</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scripts.NN.MSE">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.NN.</code><code class="sig-name descname">MSE</code><a class="headerlink" href="#scripts.NN.MSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#scripts.NN.Loss" title="scripts.NN.Loss"><code class="xref py py-class docutils literal notranslate"><span class="pre">scripts.NN.Loss</span></code></a></p>
+<p>Mean Squared Error Loss Function</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="scripts.NN.CE">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.NN.</code><code class="sig-name descname">CE</code><a class="headerlink" href="#scripts.NN.CE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#scripts.NN.Loss" title="scripts.NN.Loss"><code class="xref py py-class docutils literal notranslate"><span class="pre">scripts.NN.Loss</span></code></a></p>
+<p>Cross Entropy Loss with SoftMax included</p>
+<dl class="py method">
+<dt id="scripts.NN.CE.softmax">
+<code class="sig-name descname">softmax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.CE.softmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates softmax of a given array</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="activation-functions">
+<h1>Activation Functions<a class="headerlink" href="#activation-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="scripts.NN.Activation">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.NN.</code><code class="sig-name descname">Activation</code><a class="headerlink" href="#scripts.NN.Activation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parent class for Activation Functions</p>
+<dl class="py method">
+<dt id="scripts.NN.Activation.activation">
+<code class="sig-name descname">activation</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.Activation.activation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return activation function from child class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Params x</dt>
+<dd class="field-odd"><p>a 1D array to apply function to</p>
+</dd>
+<dt class="field-even">Returns x</dt>
+<dd class="field-even"><p>a 1D array after function application</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scripts.NN.Activation.derivative">
+<code class="sig-name descname">derivative</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.NN.Activation.derivative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return derivative of activation function from child class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Params x</dt>
+<dd class="field-odd"><p>a 1D array to calculate derivative of</p>
+</dd>
+<dt class="field-even">Returns x</dt>
+<dd class="field-even"><p>a 1D array of derivatives</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scripts.NN.Sigmoid">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.NN.</code><code class="sig-name descname">Sigmoid</code><a class="headerlink" href="#scripts.NN.Sigmoid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#scripts.NN.Activation" title="scripts.NN.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">scripts.NN.Activation</span></code></a></p>
+<p>Sigmoidal Activation function</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="scripts.NN.TanH">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.NN.</code><code class="sig-name descname">TanH</code><a class="headerlink" href="#scripts.NN.TanH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#scripts.NN.Activation" title="scripts.NN.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">scripts.NN.Activation</span></code></a></p>
+<p>Tanh Activation Function</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="scripts.NN.Free">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.NN.</code><code class="sig-name descname">Free</code><a class="headerlink" href="#scripts.NN.Free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#scripts.NN.Activation" title="scripts.NN.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">scripts.NN.Activation</span></code></a></p>
+<p>Empty Activation Layer</p>
+</dd></dl>
+
+</div>
+<div class="section" id="file-io">
+<h1>File IO<a class="headerlink" href="#file-io" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="scripts.io.FastaReader">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.io.</code><code class="sig-name descname">FastaReader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.io.FastaReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of a Fasta Reader</p>
+<p>Can be treated as an iterable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Params [path]</dt>
+<dd class="field-odd"><p>Filename of a fasta formatted txt file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="scripts.io.Kmerize">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.io.</code><code class="sig-name descname">Kmerize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span><span class="o">=</span><span class="default_value">17</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.io.Kmerize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of class to generate kmers from sequences.
+Can interact with any iterable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Params [k]</dt>
+<dd class="field-odd"><p>an integer representing the size of kmers</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="scripts.io.Kmerize.get_kmers">
+<code class="sig-name descname">get_kmers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.io.Kmerize.get_kmers" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates kmers as slices of sequences</p>
+<dl class="field-list simple">
+<dt class="field-odd">Params [s]</dt>
+<dd class="field-odd"><p>a string to create kmers from</p>
+</dd>
+<dt class="field-even">Returns [g]</dt>
+<dd class="field-even"><p>returns a generator of kmers</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scripts.io.Kmerize.process">
+<code class="sig-name descname">process</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">iterable</span></em>, <em class="sig-param"><span class="n">ohe</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.io.Kmerize.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>iterates through sequences and returns kmers</p>
+<p>Optionally can return One Hot Encoded Kmers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Params [iterable]</dt>
+<dd class="field-odd"><p>any iterable of sequences to convert to kmers</p>
+</dd>
+<dt class="field-even">Returns [g]</dt>
+<dd class="field-even"><p>returns a generator of kmers</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="data-transformations-and-utilities">
+<h1>Data Transformations and Utilities<a class="headerlink" href="#data-transformations-and-utilities" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="scripts.io.norm">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.io.</code><code class="sig-name descname">norm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.io.norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies a normalization transformation to a given dataset</p>
+<ol class="arabic simple">
+<li><p>Shifts all values to positive range ( +abs(min) )</p></li>
+<li><p>Scale values to 1/max in column</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Params [X]</dt>
+<dd class="field-odd"><p>a 2D array to normalize</p>
+</dd>
+<dt class="field-even">Returns [N]</dt>
+<dd class="field-even"><p>a 2D array that is shifted and normalized</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="scripts.io.OneHotEncoding">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.io.</code><code class="sig-name descname">OneHotEncoding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">lookup</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flatten</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.io.OneHotEncoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms a given vector of labels into a one hot encoded matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[</strong><strong>labels</strong><strong>]</strong> – an array-like of labels</p></li>
+<li><p><strong>[</strong><strong>lookup</strong><strong>]</strong> – a dictionary mapping labels to integers (optional)</p></li>
+<li><p><strong>[</strong><strong>flatten</strong><strong>]</strong> – boolean of whether to return a flattened matrix</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns [ohe]</dt>
+<dd class="field-even"><p>a 1/2D array of One Hot Encoded labels</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="scripts.io.InverseOneHotEncoding">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.io.</code><code class="sig-name descname">InverseOneHotEncoding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ohe</span></em>, <em class="sig-param"><span class="n">alphabet</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.io.InverseOneHotEncoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a flattened one hot encoding back into original alphabet</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[</strong><strong>ohe</strong><strong>]</strong> – a 1D one hot encoded array to de-embed back to labels</p></li>
+<li><p><strong>[</strong><strong>alphabet</strong><strong>]</strong> – a 1D array of labels where indices reflect ohe encoding</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns [seq]</dt>
+<dd class="field-even"><p>a string reflecting de-encoded labels</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="scripts.io.TrainTestSplit">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.io.</code><code class="sig-name descname">TrainTestSplit</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">train_size</span><span class="o">=</span><span class="default_value">0.8</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.io.TrainTestSplit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shuffles and splits a given set of data evenly</p>
+<p>:param [args] : any number of datasets to apply same split to
+:param [train_size]: the fraction of observations to use in training split</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns [_tr, _te]</dt>
+<dd class="field-odd"><p>generator of splits with (train, test) ordering</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="scripts.io.SubsetData">
+<em class="property">class </em><code class="sig-prename descclassname">scripts.io.</code><code class="sig-name descname">SubsetData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">200</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.io.SubsetData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly samples &lt;n&gt; observations from a given set of data w/o replacement</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[</strong><strong>d</strong><strong>]</strong> – a dataset to subsample</p></li>
+<li><p><strong>[</strong><strong>n</strong><strong>]</strong> – a number of observations to sample without replacement</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns [N]</dt>
+<dd class="field-even"><p>&lt;n&gt; observations sampled from data without replacement</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Noam Teyssier.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
