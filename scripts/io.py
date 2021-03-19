@@ -40,7 +40,10 @@ class FastaReader:
                         seq += line.strip()
 
                 except StopIteration:
+                    rec = (header, seq)
                     break
+
+        yield rec
 
 
 class Kmerize:
