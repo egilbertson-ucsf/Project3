@@ -1,7 +1,7 @@
 # Project 3 - Neural Networks
 ## Due 03/19/2021
 
-![BuildStatus](https://github.com/ucsf-bmi-203-2021/Project3/workflows/HW3/badge.svg?event=push)
+![BuildStatus](https://github.com/noamteyssier/Project3/workflows/HW3/badge.svg?event=push)
 
 ### main
 Runs all code in scripts/\_\_main\_\_.py, useful for part 2
