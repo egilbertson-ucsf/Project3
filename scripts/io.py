@@ -4,6 +4,9 @@ import numpy as np
 
 
 class FastaReader:
+    """
+    Implementation of a Fasta Reader
+    """
 
     def __init__(self, path):
         self.path = path
@@ -37,6 +40,11 @@ class FastaReader:
 
 
 class Kmerize:
+    """
+    Implementation of class to generate kmers from sequences.
+    Can interact with any iterable.
+    """
+
     def __init__(self, k=17):
         self.k = k
         self.lookup = {
@@ -164,26 +172,3 @@ def SubsetData(data, n=200):
     ind = np.arange(data.shape[0])
     np.random.shuffle(ind)
     return data[ind[:n]]
-
-
-def main():
-
-    np.random.seed(42)
-    a = np.random.random((40, 100))
-    b = np.random.random((40, 1))
-
-    a_train, a_test, b_train, b_test = TrainTestSplit(a, b, train_size=0.8)
-
-    print(a_train.shape)
-    print(b_test.shape)
-    # fa_path = "../data/yeast-upstream-1k-negative.fa"
-    #
-    # fa = FastaReader(fa_path)
-    # km = Kmerize()
-    #
-    # for kmer in km.process(fa, ohe=True):
-    #     print(kmer)
-
-
-if __name__ == '__main__':
-    main()
