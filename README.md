@@ -3,15 +3,50 @@
 
 ![BuildStatus](https://github.com/noamteyssier/Project3/workflows/HW3/badge.svg?event=push)
 
-### main
-Runs all code in scripts/\_\_main\_\_.py, useful for part 2
+
+Project 3 Implementations of :
+    Neural Networks
+    Activation Functions
+    Cost Functions
+    Fasta IO
+    Data Transformations
+
+Source Code in :
 ```
-python -m scripts
+scripts/NN.py
+scripts/io.py
 ```
 
-### testing
-Testing is as simple as running
+Testing in :
 ```
-python -m pytest test/*
+scripts/test.py
 ```
-from the root directory of this project.
+
+Documentation in :
+```
+build/html/index.html
+```
+
+Notebook Responses in :
+```
+Noam_Teyssier_BMI203_HW3.ipynb
+```
+
+Raw Sequence Data in :
+```
+# negative sequences for training
+data/yeast-upstream-1k-negative.fa
+
+# positive sequences for training
+data/rap1-lieb-positives.txt
+
+# test dataset
+data/rap1-lieb-test.txt
+
+```
+
+Model Predictions in :
+```
+# model predictions
+data/rap1_predictions.tsv
+```
