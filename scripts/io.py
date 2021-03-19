@@ -111,6 +111,20 @@ def OneHotEncoding(labels, lookup=None, flatten=False):
     return ohe
 
 
+def InverseOneHotEncoding(ohe, alphabet):
+    """
+    convert flattened one hot encoding back into original alphabet
+    """
+
+    alphabet = np.array(alphabet)
+
+    labels = ohe.\
+        reshape(int(ohe.size/alphabet.size), alphabet.size).\
+        argmax(axis=1)
+
+    return ''.join(alphabet[labels])
+
+
 def TrainTestSplit(*args, train_size=0.8):
     """
     shuffles and splits a given set of data evenly
@@ -141,13 +155,14 @@ def TrainTestSplit(*args, train_size=0.8):
         for i in [train_ind, test_ind]:
             yield a[i]
 
+
 def main():
 
     np.random.seed(42)
     a = np.random.random((40, 100))
     b = np.random.random((40, 1))
 
-    a_train, a_test, b_train, b_test = TrainTestSplit(a,b, train_size=0.8)
+    a_train, a_test, b_train, b_test = TrainTestSplit(a, b, train_size=0.8)
 
     print(a_train.shape)
     print(b_test.shape)
