@@ -111,15 +111,53 @@ def OneHotEncoding(labels, lookup=None, flatten=False):
     return ohe
 
 
+def TrainTestSplit(*args, train_size=0.8):
+    """
+    shuffles and splits a given set of data evenly
+    """
+
+    # confirm all datasets share the same size
+    n_obs = np.unique([a.shape[0] for a in args])
+    assert n_obs.size == 1
+
+    # identify the size
+    n_obs = n_obs[0]
+
+    # calculate the number of observations from the given fraction
+    pos = int(n_obs*train_size)
+
+    # initialize the inidices
+    indices = np.arange(n_obs)
+
+    # shuffle the indices
+    np.random.shuffle(indices)
+
+    # split the random indices into train and test sets
+    train_ind = indices[:pos]
+    test_ind = indices[pos:]
+
+    # generate the split datasets as [train, test] pairs
+    for a in args:
+        for i in [train_ind, test_ind]:
+            yield a[i]
+
 def main():
 
-    fa_path = "../data/yeast-upstream-1k-negative.fa"
+    np.random.seed(42)
+    a = np.random.random((40, 100))
+    b = np.random.random((40, 1))
 
-    fa = FastaReader(fa_path)
-    km = Kmerize()
+    a_train, a_test, b_train, b_test = TrainTestSplit(a,b, train_size=0.8)
 
-    for kmer in km.process(fa, ohe=True):
-        print(kmer)
+    print(a_train.shape)
+    print(b_test.shape)
+    # fa_path = "../data/yeast-upstream-1k-negative.fa"
+    #
+    # fa = FastaReader(fa_path)
+    # km = Kmerize()
+    #
+    # for kmer in km.process(fa, ohe=True):
+    #     print(kmer)
 
 
 if __name__ == '__main__':
