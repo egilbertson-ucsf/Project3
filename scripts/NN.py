@@ -368,6 +368,64 @@ class NeuralNetwork:
                         )
                 )
 
+    def minibatch_reader(self, *args, batch_size=10):
+        """
+        shuffles indices and yields batches of indices
+        """
+
+        num_obs = np.unique([a.shape[0] for a in args])
+        assert num_obs.size == 1
+
+        random_indices = np.random.choice(
+            num_obs[0], size=num_obs[0], replace=False
+        )
+
+        it = 0
+        while True:
+            i = batch_size * it
+            j = i + batch_size
+            it += 1
+
+            if i >= num_obs[0]:
+                break
+
+            if j > num_obs[0]:
+                j = num_obs[0]
+
+            yield random_indices[i:j]
+
+    def minibatch_fit(self, X, Y, Loss, n_epochs=100,
+                      batch_size=10, status_updates=10
+                      ):
+        """
+        trains a model with minibatch regularization
+        """
+
+        for epoch in np.arange(n_epochs):
+
+            losses = []
+
+            for ind in self.minibatch_reader(X, Y, batch_size=batch_size):
+
+                sub_X = X[ind]
+                sub_Y = Y[ind]
+
+                for x, y in zip(sub_X, sub_Y):
+                    pred = self.forward(x)
+                    loss = Loss.loss(pred, y)
+                    self.backward(y, Loss)
+                    losses.append(loss)
+
+                self.step()
+                self.clear()
+
+            if (epoch % status_updates == 0) | (epoch == n_epochs-1):
+                print(
+                    "Mean Loss at epoch {} : {:.6f}".format(
+                        epoch, np.mean(losses)
+                        )
+                )
+
     def predict(self, X):
         """
         feeds forward all observations in X and returns predictions
@@ -385,27 +443,25 @@ def main():
 
     np.random.seed(42)
 
-    X, labels = make_blobs(n_samples=100, n_features=8, centers=3)
-    Y = np.zeros((labels.size, 4))
-    Y[np.flatnonzero(labels == 0), 0] = 1
-    Y[np.flatnonzero(labels == 1), 1] = 1
-    Y[np.flatnonzero(labels == 2), 2] = 1
-    Y[np.flatnonzero(labels == 3), 3] = 1
+    X, labels = make_blobs(
+        n_samples=300, n_features=8, centers=2, center_box=(0,1)
+        )
 
     nn = NeuralNetwork(
         layers=[
             (8, None),
             (4, Sigmoid),
-            (4, Free)
+            (8, Sigmoid)
         ],
-        learning_rate=0.05
+        learning_rate=0.1
     )
-    # Loss = MSE()
-    Loss = CE()
+    Loss = MSE()
+    # Loss = CE()
 
-    nn.fit(X, Y, Loss, n_epochs=300)
-    nn.predict(X)
+    # nn.fit(X, X, Loss, n_epochs=300)
+    # nn.predict(X)
 
+    nn.minibatch_fit(X, X, Loss)
 
 if __name__ == '__main__':
     main()
