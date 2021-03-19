@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 from sklearn.datasets import make_blobs
-
+import sys
 
 class Loss:
     """
@@ -344,7 +344,7 @@ class NeuralNetwork:
         self.d_weights = []
         self.d_bias = []
 
-    def fit(self, X, Y, Loss, n_epochs=100, status_updates=10):
+    def fit(self, X, Y, Loss, n_epochs=100, status_updates=10, verbose=False):
         """
         trains model given X:observations and Y:labels
         """
@@ -361,12 +361,14 @@ class NeuralNetwork:
             self.step()
             self.clear()
 
-            if (epoch % status_updates == 0) | (epoch == n_epochs-1):
-                print(
-                    "Mean Loss at epoch {} : {:.6f}".format(
-                        epoch, np.mean(losses)
-                        )
-                )
+            if verbose:
+                if (epoch % status_updates == 0) | (epoch == n_epochs-1):
+                    print(
+                        "Mean Loss at epoch {} : {:.6f}".format(
+                            epoch, np.mean(losses)
+                            ),
+                        file=sys.stderr
+                    )
 
     def minibatch_reader(self, *args, batch_size=10):
         """
@@ -395,7 +397,8 @@ class NeuralNetwork:
             yield random_indices[i:j]
 
     def minibatch_fit(self, X, Y, Loss, n_epochs=100,
-                      batch_size=10, status_updates=10
+                      batch_size=10, status_updates=10,
+                      verbose=False
                       ):
         """
         trains a model with minibatch regularization
@@ -419,12 +422,14 @@ class NeuralNetwork:
                 self.step()
                 self.clear()
 
-            if (epoch % status_updates == 0) | (epoch == n_epochs-1):
-                print(
-                    "Mean Loss at epoch {} : {:.6f}".format(
-                        epoch, np.mean(losses)
-                        )
-                )
+            if verbose:
+                if (epoch % status_updates == 0) | (epoch == n_epochs-1):
+                    print(
+                        "Mean Loss at epoch {} : {:.6f}".format(
+                            epoch, np.mean(losses)
+                            ),
+                        file=sys.stderr
+                    )
 
     def predict(self, X):
         """
@@ -444,7 +449,7 @@ def main():
     np.random.seed(42)
 
     X, labels = make_blobs(
-        n_samples=300, n_features=8, centers=2, center_box=(0,1)
+        n_samples=300, n_features=8, centers=2, center_box=(0, 1)
         )
 
     nn = NeuralNetwork(
