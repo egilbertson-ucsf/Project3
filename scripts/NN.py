@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
+
 import numpy as np
-from sklearn.datasets import make_blobs
 import sys
+
 
 class Loss:
     """
@@ -9,9 +10,17 @@ class Loss:
     """
 
     def loss(self, *args, **kwargs):
+        """
+        return child class loss function
+        """
+
         return self.__loss__(*args, **kwargs)
 
     def derivative(self, *args, **kwargs):
+        """
+        return derivative of child class loss function
+        """
+
         return self.__derivative__(*args, **kwargs)
 
 
@@ -73,9 +82,17 @@ class Activation:
     """
 
     def activation(self, *args, **kwargs):
+        """
+        Return activation function from child class
+        """
+
         return self.__activation__(*args, **kwargs)
 
     def derivative(self, *args, **kwargs):
+        """
+        Return derivative of activation function from child class
+        """
+
         return self.__derivative__(*args, **kwargs)
 
 
@@ -170,6 +187,9 @@ class Free(Activation):
 
 
 class NeuralNetwork:
+    """
+    Implementation of a feed forward neural network with backpropagation
+    """
 
     def __init__(self, layers, learning_rate=0.1):
 
@@ -199,6 +219,7 @@ class NeuralNetwork:
         for i in np.arange(self.layers.shape[0]):
 
             if i > 0:
+
                 self.params['weights'].append(
                     np.random.random(
                         (self.layers[i][0], self.layers[i-1][0])
@@ -262,14 +283,21 @@ class NeuralNetwork:
         calculates gradients via backpropagation
         """
 
+        # cache previous layers derivatives
         cache_dC_dA_dZ = []
+
+        # initialize derivative weights and biases to fill
         d_weights = self.params['weights'].copy()
         d_bias = self.params['bias'].copy()
 
+        # walk through network backwards
         for idx in np.arange(self.layers.shape[0])[::-1]:
+
+            # dont derive the input layer
             if idx == 0:
                 break
 
+            # derivative of the cost function
             elif idx == self.layers.shape[0] - 1:
 
                 # derivative of cost wrt final activation
@@ -279,6 +307,7 @@ class NeuralNetwork:
                 )
                 dC_dA = dC_dA.reshape(1, dC_dA.size)
 
+            # derivative of cost wrt layers activation
             else:
 
                 # calculates current activation derivative using cached layers
@@ -311,6 +340,9 @@ class NeuralNetwork:
         self.d_bias.append(d_bias)
 
     def step(self):
+        """
+        steps through weights and biases and applies derivatives
+        """
 
         # iterate through layers
         for i in np.arange(len(self.params['weights'])):
@@ -341,6 +373,10 @@ class NeuralNetwork:
             self.params['bias'][i] -= mean_d_bias_tensor
 
     def clear(self):
+        """
+        empty the current derivatives and biases
+        """
+
         self.d_weights = []
         self.d_bias = []
 
@@ -349,18 +385,34 @@ class NeuralNetwork:
         trains model given X:observations and Y:labels
         """
 
+        # iterate through dataset
         for epoch in np.arange(n_epochs):
+
+            # holds losses during epoch
             losses = []
+
+            # iterate through observations and labels
             for x, y in zip(X, Y):
+
+                # forward pass
                 pred = self.forward(x)
+
+                # calculate loss
                 loss = Loss.loss(pred, y)
+
+                # calculate gradient
                 self.backward(y, Loss)
 
+                # store loss
                 losses.append(loss)
 
+            # applies gradient descent
             self.step()
+
+            # clears gradients between epochs
             self.clear()
 
+            # prints out current epochs mean loss
             if verbose:
                 if (epoch % status_updates == 0) | (epoch == n_epochs-1):
                     print(
@@ -404,21 +456,31 @@ class NeuralNetwork:
         trains a model with minibatch regularization
         """
 
+        # iterate through dataset
         for epoch in np.arange(n_epochs):
 
+            # stores losses
             losses = []
 
+            # read indices from minibatches
             for ind in self.minibatch_reader(X, Y, batch_size=batch_size):
 
+                # subset x and y with indices
                 sub_X = X[ind]
                 sub_Y = Y[ind]
 
+                # fit batch
                 for x, y in zip(sub_X, sub_Y):
+
+                    # forward pass
                     pred = self.forward(x)
                     loss = Loss.loss(pred, y)
+
+                    # backward prop
                     self.backward(y, Loss)
                     losses.append(loss)
 
+                # apply gradients each batch
                 self.step()
                 self.clear()
 
@@ -436,37 +498,12 @@ class NeuralNetwork:
         feeds forward all observations in X and returns predictions
         """
 
+        # stores predictions
         predictions = []
         for x in X:
+
+            # forward pass
             pred = self.forward(x)
             predictions.append(pred)
 
         return np.array(predictions)
-
-
-def main():
-
-    np.random.seed(42)
-
-    X, labels = make_blobs(
-        n_samples=300, n_features=8, centers=2, center_box=(0, 1)
-        )
-
-    nn = NeuralNetwork(
-        layers=[
-            (8, None),
-            (4, Sigmoid),
-            (8, Sigmoid)
-        ],
-        learning_rate=0.1
-    )
-    Loss = MSE()
-    # Loss = CE()
-
-    # nn.fit(X, X, Loss, n_epochs=300)
-    # nn.predict(X)
-
-    nn.minibatch_fit(X, X, Loss)
-
-if __name__ == '__main__':
-    main()
