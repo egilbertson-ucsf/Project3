@@ -156,6 +156,16 @@ def TrainTestSplit(*args, train_size=0.8):
             yield a[i]
 
 
+def SubsetData(data, n=200):
+    """
+    randomly samples <n> observations from a given set of data w/o replacement
+    """
+    n = int(n)
+    ind = np.arange(data.shape[0])
+    np.random.shuffle(ind)
+    return data[ind[:n]]
+
+
 def main():
 
     np.random.seed(42)
