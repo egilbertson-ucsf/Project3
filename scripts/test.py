@@ -1,12 +1,13 @@
-from scripts import NN
+from scripts import NN as nn
 from scripts import io
+from sklearn.datasets import make_blobs
 
 import numpy as np
 import os
 
 
 def test_activation_sigmoid():
-    a = NN.Sigmoid()
+    a = nn.Sigmoid()
     test = np.random.random((1, 100))
     test_activation = a.activation(test)
     test_derivative = a.derivative(test)
@@ -16,7 +17,7 @@ def test_activation_sigmoid():
 
 
 def test_activation_tanh():
-    a = NN.TanH()
+    a = nn.TanH()
     test = np.random.random((1, 100))
     test_activation = a.activation(test)
     test_derivative = a.derivative(test)
@@ -26,7 +27,7 @@ def test_activation_tanh():
 
 
 def test_activation_free():
-    a = NN.Free()
+    a = nn.Free()
     test = np.random.random((1, 100))
     test_activation = a.activation(test)
     test_derivative = a.derivative(test)
@@ -37,7 +38,7 @@ def test_activation_free():
 
 
 def test_MSE():
-    Loss = NN.MSE()
+    Loss = nn.MSE()
     test_x = np.random.random((1, 100))
     test_y = np.random.random((1, 100))
 
@@ -49,7 +50,7 @@ def test_MSE():
 
 
 def test_CE():
-    Loss = NN.CE()
+    Loss = nn.CE()
     test_x = np.random.random((3, 100))
     test_y = np.random.random((3, 100))
 
@@ -104,3 +105,36 @@ def test_OHE():
         )
 
     assert ''.join([str(i) for i in labels]) == back_labels
+
+
+def test_norm():
+    X, labels = make_blobs(
+        n_samples=200, n_features=8, centers=4
+        )
+    N = io.norm(X)
+
+    assert N.shape == X.shape
+    assert N.max() <= 1
+    assert N.min() >= 0
+
+
+def test_nn():
+    X, labels = make_blobs(
+        n_samples=200, n_features=8, centers=4
+        )
+    N = io.norm(X)
+
+    net = nn.NeuralNetwork(
+        layers=[
+            (8, None),
+            (4, nn.Sigmoid),
+            (8, nn.Sigmoid)
+        ],
+        learning_rate=0.8
+    )
+    Loss = nn.MSE()
+
+    net.fit(N, N, Loss)
+    Y = net.predict(N)
+
+    assert np.isnan(Y).sum() == 0
